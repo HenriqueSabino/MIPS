@@ -14,7 +14,7 @@ public class JInstruction extends Instruction {
     }
 
     public int getAd() {
-        return getInstruction() & 000377777777;
+        return getInstruction() & 0x03FFFFFF;
     }
 
 }
