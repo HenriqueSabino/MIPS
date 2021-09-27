@@ -1,17 +1,31 @@
-import model.instructions.*;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+
+import model.processor.ControlUnit;
 
 public class App {
     public static void main(String[] args) throws Exception {
 
-        RInstruction inst = new RInstruction(0x00020a82);
+        ControlUnit cu = new ControlUnit();
 
-        System.out.println(toBinary(inst.getInstruction()));
-        System.out.println("Op: " + inst.getOpcode());
-        System.out.println("Rd: " + inst.getRd());
-        System.out.println("Rs: " + inst.getRs());
-        System.out.println("Rt: " + inst.getRt());
-        System.out.println("Shamt: " + inst.getShamt());
-        System.out.println("Funct: " + inst.getFunction());
+        File out = new File("out.txt");
+        FileWriter fw = new FileWriter(out);
+        BufferedWriter bw = new BufferedWriter(fw);
+
+        while (true) {
+            cu.readInstruction();
+
+            if (!cu.hasNextInstruction())
+                break;
+            else
+                bw.write("\n");
+
+            bw.write(cu.assemblyInstruction());
+        }
+
+        bw.close();
+        fw.close();
     }
 
     private static String toBinary(int i) {
