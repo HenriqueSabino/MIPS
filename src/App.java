@@ -18,10 +18,8 @@ public class App {
 
             if (!cu.hasNextInstruction())
                 break;
-            else
-                bw.write("\n");
 
-            bw.write(cu.assemblyInstruction());
+            bw.write(cu.assemblyInstruction() + "\n");
         }
 
         bw.close();
