@@ -125,10 +125,56 @@ public class ControlUnit {
     }
 
     private String assemblyIInstruction() {
+
+        IInstruction iInstruction = (IInstruction) currentInstruction;
+        
+        switch(iInstruction.getOpcode()){
+            case 0x01:    // 1
+                return "bltz ";
+            case 0x04   : // 4
+                return "beq ";
+            case 0x05:    // 5
+                return "bne ";
+            case 0x08:    // 8
+                return "addi ";
+            case 0x09:    // 9
+                return "addiu ";
+            case 0x0a:    //10
+                return "slti ";
+            case 0x0c:    //12
+                return "andi ";
+            case 0x0d:    //13
+                return "ori ";
+            case 0x0e:    //14
+                return "xori ";
+            case 0x0f:    //15
+                return "lui ";
+            case 0x32:    //32
+                return "lb ";
+            case 0x23:    //35
+                return "lw ";
+            case 0x24:    //36
+                return "lbu ";
+            case 0x28:    //40
+                return "sb s";
+            case 0x2b:    //43
+                return "sw ";
+        }
+
+
         return "";
     }
 
     private String assemblyJInstruction() {
+
+        JInstruction jInstruction = (JInstruction) currentInstruction;
+
+        switch(jInstruction.get_opcode()){
+            case 0x02: // 2
+                return "";
+            case 0x03: // 3
+                return "";
+        }
         return "";
     }
 
