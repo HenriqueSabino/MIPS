@@ -99,6 +99,8 @@ public class ControlUnit {
                 return "xor " + threeRegisterR(rInstruction);
             case 0x27:
                 return "nor " + threeRegisterR(rInstruction);
+            case 0x2a:
+                return "slt " + threeRegisterR(rInstruction);
 
         }
         return "";
@@ -130,46 +132,58 @@ public class ControlUnit {
         
         switch(iInstruction.getOpcode()){
             case 0x01:    // 1
-                return "bltz ";
+                return "bltz " + oneRegisterI(iInstruction);
             case 0x04   : // 4
-                return "beq ";
+                return "beq " + twoRegisterI(iInstruction);
             case 0x05:    // 5
-                return "bne ";
+                return "bne " + twoRegisterI(iInstruction);
             case 0x08:    // 8
-                return "addi ";
+                return "addi " + twoRegisterI(iInstruction);
             case 0x09:    // 9
-                return "addiu ";
+                return "addiu " + twoRegisterI(iInstruction);
             case 0x0a:    //10
-                return "slti ";
+                return "slti " + twoRegisterI(iInstruction);
             case 0x0c:    //12
-                return "andi ";
+                return "andi " + twoRegisterI(iInstruction);
             case 0x0d:    //13
-                return "ori ";
+                return "ori "+ twoRegisterI(iInstruction);
             case 0x0e:    //14
-                return "xori ";
+                return "xori " + twoRegisterI(iInstruction);
             case 0x0f:    //15
-                return "lui ";
+                return "lui " + oneRegisterI(iInstruction);
             case 0x32:    //32
-                return "lb ";
+                return "lb " + displacementIInstruction(iInstruction);
             case 0x23:    //35
-                return "lw ";
+                return "lw " + displacementIInstruction(iInstruction);
             case 0x24:    //36
-                return "lbu ";
+                return "lbu " + displacementIInstruction(iInstruction);
             case 0x28:    //40
-                return "sb s";
+                return "sb" + displacementIInstruction(iInstruction);
             case 0x2b:    //43
-                return "sw ";
+                return "sw " + displacementIInstruction(iInstruction);
         }
 
 
         return "";
     }
 
+    private String twoRegisterI(IInstruction iInstruction) {
+        return "$" + iInstruction.getRs() + ", $" + iInstruction.getRt() + ", " + iInstruction.getIm();
+    }
+
+    private String displacementIInstruction(IInstruction iInstruction) {
+        return "$" + iInstruction.getRs() + ", " + iInstruction.getIm() + "(" + iInstruction.getRt() + ")";
+    }
+
+    private String oneRegisterI(IInstruction iInstruction) {
+        return "$" + iInstruction.getRt() + ", " + iInstruction.getIm();
+    }
+
     private String assemblyJInstruction() {
 
         JInstruction jInstruction = (JInstruction) currentInstruction;
 
-        switch(jInstruction.get_opcode()){
+        switch(jInstruction.getOpcode()){
             case 0x02: // 2
                 return "";
             case 0x03: // 3

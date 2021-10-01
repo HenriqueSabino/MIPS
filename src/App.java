@@ -26,7 +26,4 @@ public class App {
         fw.close();
     }
 
-    private static String toBinary(int i) {
-        return String.format("%32s", Integer.toBinaryString(i)).replace(' ', '0');
-    }
 }
