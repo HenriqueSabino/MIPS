@@ -15,12 +15,12 @@ public class IInstruction extends Instruction {
 
     // Retorna o Registrador de origem 1 da instrução
     public int getRs() {
-        return (getInstruction() & 0x03E00000) >> 21;
+        return (getInstruction() & 0x03E00000) >>> 21;
     }
 
     // Retorna o Registrador de origem 2 da instrução
     public int getRt() {
-        return (getInstruction() & 0x001F0000) >> 16;
+        return (getInstruction() & 0x001F0000) >>> 16;
     }
 
     // Retorna o valor do operando ou offset da instrução

@@ -17,6 +17,6 @@ public class Instruction {
     public int getOpcode() {
         // Java não tem unsigned int, então temos que forçar a interpretação utilizando
         // toUnsignedLong
-        return (int) (Integer.toUnsignedLong(instruction) >> 26);
+        return instruction >>> 26;
     }
 }

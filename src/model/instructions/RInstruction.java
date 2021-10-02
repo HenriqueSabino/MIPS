@@ -15,22 +15,22 @@ public class RInstruction extends Instruction {
 
     // Retorna o Registrador de origem 1 da instrução
     public int getRs() {
-        return (getInstruction() & 0x03E00000) >> 21;
+        return (getInstruction() & 0x03E00000) >>> 21;
     }
 
     // Retorna o Registrador de origem 2 da instrução
     public int getRt() {
-        return (getInstruction() & 0x001F0000) >> 16;
+        return (getInstruction() & 0x001F0000) >>> 16;
     }
 
     // Retorna o Registrador de destino da instrução
     public int getRd() {
-        return (getInstruction() & 0x0000F800) >> 11;
+        return (getInstruction() & 0x0000F800) >>> 11;
     }
 
     // Retorna a quantidade de shift da instrução
     public int getShamt() {
-        return (getInstruction() & 0x000007C0) >> 6;
+        return (getInstruction() & 0x000007C0) >>> 6;
     }
 
     // Retorna os últimos 6 bits da instrução

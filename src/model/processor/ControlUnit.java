@@ -1,9 +1,6 @@
 package model.processor;
 
-import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 
 import model.instructions.IInstruction;
@@ -13,37 +10,33 @@ import model.instructions.RInstruction;
 
 public class ControlUnit {
 
-    // arquivo de entrada
-    private File instructionMemory;
-    private FileReader fr;
-    private BufferedReader br;
-
-    String currentInstructionStr;
+    InstructionMemory instructionMemory;
     Instruction currentInstruction;
 
-    public ControlUnit() throws FileNotFoundException {
+    int PC = 0x00000000;
 
-        instructionMemory = new File("entrada.txt");
-        fr = new FileReader(instructionMemory);
-        br = new BufferedReader(fr);
+    public ControlUnit() throws FileNotFoundException, IOException {
+        instructionMemory = new InstructionMemory();
     }
 
     public boolean hasNextInstruction() {
-        return currentInstructionStr != null;
+        return currentInstruction != null;
     }
 
     public void readInstruction() {
 
         try {
-            currentInstructionStr = br.readLine();
+            int instruction = Byte.toUnsignedInt(instructionMemory.getInstructionMemory().get(PC));
+            instruction = (instruction << 8)
+                    | (int) Byte.toUnsignedInt(instructionMemory.getInstructionMemory().get(PC + 1));
+            instruction = (instruction << 8)
+                    | (int) Byte.toUnsignedInt(instructionMemory.getInstructionMemory().get(PC + 2));
+            instruction = (instruction << 8)
+                    | (int) Byte.toUnsignedInt(instructionMemory.getInstructionMemory().get(PC + 3));
 
-            if (currentInstructionStr != null) {
-                int instruction = Integer.parseUnsignedInt(currentInstructionStr.substring(2), 16);
-
-                decodeInstruction(instruction);
-            }
-
-        } catch (IOException e) {
+            PC += 4;
+            decodeInstruction(instruction);
+        } catch (Exception e) {
             currentInstruction = null;
         }
     }
@@ -111,7 +104,7 @@ public class ControlUnit {
                 return "slt " + threeRegisterR(rInstruction);
 
         }
-        return Integer.toHexString(rInstruction.getFunction());
+        return "";
     }
 
     private String threeRegisterR(RInstruction rInstruction) {
@@ -170,12 +163,12 @@ public class ControlUnit {
             case 0x24: // 36
                 return "lbu " + displacementIInstruction(iInstruction);
             case 0x28: // 40
-                return "sb" + displacementIInstruction(iInstruction);
+                return "sb " + displacementIInstruction(iInstruction);
             case 0x2b: // 43
                 return "sw " + displacementIInstruction(iInstruction);
         }
 
-        return Integer.toHexString(iInstruction.getOpcode());
+        return "";
     }
 
     private String twoRegisterI(IInstruction iInstruction) {
@@ -183,11 +176,21 @@ public class ControlUnit {
     }
 
     private String banchIInstruction(IInstruction iInstruction) {
-        return "$" + iInstruction.getRs() + ", $" + iInstruction.getRt() + ", " + iInstruction.getIm();
+        short im = (short) iInstruction.getIm(); // Should be 16bits
+        int signExtendedIm = im; // Java auto signextends
+
+        int address = PC + signExtendedIm * 4;
+
+        return "$" + iInstruction.getRs() + ", $" + iInstruction.getRt() + ", " + address;
     }
 
     private String branchOneRegisterI(IInstruction iInstruction) {
-        return "$" + iInstruction.getRs() + ", " + iInstruction.getIm();
+        short im = (short) iInstruction.getIm(); // Should be 16bits
+        int signExtendedIm = im; // Java auto sign extends
+
+        int address = PC + signExtendedIm * 4;
+
+        return "$" + iInstruction.getRs() + ", " + address;
     }
 
     private String displacementIInstruction(IInstruction iInstruction) {
@@ -202,11 +205,13 @@ public class ControlUnit {
 
         JInstruction jInstruction = (JInstruction) currentInstruction;
 
+        int address = (PC & 0xF0000000) | ((jInstruction.getAd() << 2));
+
         switch (jInstruction.getOpcode()) {
             case 0x02: // 2
-                return "";
+                return "j " + address;
             case 0x03: // 3
-                return "";
+                return "jal " + address;
         }
         return "";
     }
