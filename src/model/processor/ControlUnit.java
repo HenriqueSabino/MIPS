@@ -1,12 +1,12 @@
 package model.processor;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-
 import model.instructions.IInstruction;
 import model.instructions.Instruction;
 import model.instructions.JInstruction;
 import model.instructions.RInstruction;
+
+import java.io.FileNotFoundException;
+import java.io.IOException;
 
 public class ControlUnit {
 
@@ -61,76 +61,52 @@ public class ControlUnit {
             case 0x00:
                 return alu.shiftLeftLogical(rInstruction.getRd(), rInstruction.getRt(), rInstruction.getShamt());
             case 0x02:
-                return "srl " + shiftInstruction(rInstruction);
+                return alu.shiftRightLogical(rInstruction.getRd(), rInstruction.getRt(), rInstruction.getShamt());
             case 0x03:
-                return "sra " + shiftInstruction(rInstruction);
+                return alu.shiftRightArithmetic(rInstruction.getRd(), rInstruction.getRt(), rInstruction.getShamt());
             case 0x04:
-                return "sllv " + variableShift(rInstruction);
+                return alu.shiftLeftLogicalVariable(rInstruction.getRd(), rInstruction.getRt(), rInstruction.getRs());
             case 0x06:
-                return "srlv " + variableShift(rInstruction);
+                return alu.shiftRightLogicalVariable(rInstruction.getRd(), rInstruction.getRt(), rInstruction.getRs());
             case 0x07:
-                return "srav " + variableShift(rInstruction);
+                return alu.shiftRightArithmeticVariable(rInstruction.getRd(), rInstruction.getRt(), rInstruction.getRs());
             case 0x08:
-                return "jr " + jumpR(rInstruction);
+                return alu.jumpRegister(rInstruction.getRs());
             case 0x0c:
-                return "syscall";
+                return alu.systemCall();
             case 0x10:
-                return "mfhi " + oneRegisterR(rInstruction);
+                return alu.moveFromHI(rInstruction.getRd());
             case 0x12:
-                return "mflo " + oneRegisterR(rInstruction);
+                return alu.moveFromLO(rInstruction.getRd());
             case 0x18:
-                return "mult " + twoRegisterR(rInstruction);
+                return alu.multiply(rInstruction.getRs(),rInstruction.getRt());
             case 0x19:
-                return "multu " + twoRegisterR(rInstruction);
+                return alu.multiplyUnsigned(rInstruction.getRs(),rInstruction.getRt());
             case 0x1a:
-                return "div " + twoRegisterR(rInstruction);
+                return alu.divide(rInstruction.getRs(),rInstruction.getRt());
             case 0x1b:
-                return "divu " + twoRegisterR(rInstruction);
+                return alu.divideUnsigned(rInstruction.getRs(),rInstruction.getRt());
             case 0x20:
-                return "add " + threeRegisterR(rInstruction);
+                return alu.add(rInstruction.getRd(),rInstruction.getRs(),rInstruction.getRt());
             case 0x21:
-                return "addu " + threeRegisterR(rInstruction);
+                return alu.addUnsigned(rInstruction.getRd(),rInstruction.getRs(),rInstruction.getRt());
             case 0x22:
-                return "sub " + threeRegisterR(rInstruction);
+                return alu.subtract(rInstruction.getRd(),rInstruction.getRs(),rInstruction.getRt());
             case 0x23:
-                return "subu " + threeRegisterR(rInstruction);
+                return alu.subtractUnsigned(rInstruction.getRd(),rInstruction.getRs(),rInstruction.getRt());
             case 0x24:
-                return "and " + threeRegisterR(rInstruction);
+                return alu.bitwiseAnd(rInstruction.getRd(),rInstruction.getRs(),rInstruction.getRt());
             case 0x25:
-                return "or " + threeRegisterR(rInstruction);
+                return alu.bitwiseOr(rInstruction.getRd(),rInstruction.getRs(),rInstruction.getRt());
             case 0x26:
-                return "xor " + threeRegisterR(rInstruction);
+                return alu.bitwiseExclusiveOr(rInstruction.getRd(),rInstruction.getRs(),rInstruction.getRt());
             case 0x27:
-                return "nor " + threeRegisterR(rInstruction);
+                return alu.bitwiseNor(rInstruction.getRd(),rInstruction.getRs(),rInstruction.getRt());
             case 0x2a:
-                return "slt " + threeRegisterR(rInstruction);
+                return alu.setLessThan(rInstruction.getRd(),rInstruction.getRs(),rInstruction.getRt());
 
         }
         return "";
-    }
-
-    private String threeRegisterR(RInstruction rInstruction) {
-        return "$" + rInstruction.getRd() + ", $" + rInstruction.getRs() + ", $" + rInstruction.getRt();
-    }
-
-    private String twoRegisterR(RInstruction rInstruction) {
-        return "$" + rInstruction.getRs() + ", $" + rInstruction.getRt();
-    }
-
-    private String oneRegisterR(RInstruction rInstruction) {
-        return "$" + rInstruction.getRd();
-    }
-
-    private String variableShift(RInstruction rInstruction) {
-        return "$" + rInstruction.getRd() + ", $" + rInstruction.getRt() + ", $" + rInstruction.getRs();
-    }
-
-    private String shiftInstruction(RInstruction rInstruction) {
-        return "$" + rInstruction.getRd() + ", $" + rInstruction.getRt() + ", " + rInstruction.getShamt();
-    }
-
-    private String jumpR(RInstruction rInstruction) {
-        return "$" + rInstruction.getRs();
     }
 
     private String assemblyIInstruction() {
@@ -139,68 +115,38 @@ public class ControlUnit {
 
         switch (iInstruction.getOpcode()) {
             case 0x01: // 1
-                return "bltz " + branchOneRegisterI(iInstruction);
+                return alu.branchLessThanZero(iInstruction.getRs(),iInstruction.getIm(), PC);
             case 0x04: // 4
-                return "beq " + branchIInstruction(iInstruction);
+                return alu.branchEqual(iInstruction.getRs(),iInstruction.getRt(),iInstruction.getIm(), PC);
             case 0x05: // 5
-                return "bne " + branchIInstruction(iInstruction);
+                return alu.branchNotEqual(iInstruction.getRs(),iInstruction.getRt(),iInstruction.getIm(), PC);
             case 0x08: // 8
-                return "addi " + twoRegisterI(iInstruction);
+                return alu.addImmediate(iInstruction.getRt(),iInstruction.getRs(),iInstruction.getIm());
             case 0x09: // 9
-                return "addiu " + twoRegisterI(iInstruction);
+                return alu.addImmediateUnsigned(iInstruction.getRt(),iInstruction.getRs(),iInstruction.getIm());
             case 0x0a: // 10
-                return "slti " + twoRegisterI(iInstruction);
+                return alu.setLessThanImmediate(iInstruction.getRt(),iInstruction.getRs(),iInstruction.getIm());
             case 0x0c: // 12
-                return "andi " + twoRegisterI(iInstruction);
+                return alu.bitwiseAndImmediate(iInstruction.getRt(),iInstruction.getRs(),iInstruction.getIm());
             case 0x0d: // 13
-                return "ori " + twoRegisterI(iInstruction);
+                return alu.bitwiseOrImmediate(iInstruction.getRt(),iInstruction.getRs(),iInstruction.getIm());
             case 0x0e: // 14
-                return "xori " + twoRegisterI(iInstruction);
+                return alu.bitwiseXorImmediate(iInstruction.getRt(),iInstruction.getRs(),iInstruction.getIm());
             case 0x0f: // 15
-                return "lui " + loadIInstruction(iInstruction);
+                return alu.loadUpperImmediate(iInstruction.getRt(),iInstruction.getIm());
             case 0x20: // 32
-                return "lb " + displacementIInstruction(iInstruction);
+                return alu.loadByte(iInstruction.getRt(),iInstruction.getRs(),iInstruction.getIm());
             case 0x23: // 35
-                return "lw " + displacementIInstruction(iInstruction);
+                return alu.loadWord(iInstruction.getRt(),iInstruction.getRs(),iInstruction.getIm());
             case 0x24: // 36
-                return "lbu " + displacementIInstruction(iInstruction);
+                return alu.loadByteUnsigned(iInstruction.getRt(),iInstruction.getRs(),iInstruction.getIm());
             case 0x28: // 40
-                return "sb " + displacementIInstruction(iInstruction);
+                return alu.storeByte(iInstruction.getRt(),iInstruction.getRs(),iInstruction.getIm());
             case 0x2b: // 43
-                return "sw " + displacementIInstruction(iInstruction);
+                return alu.storeWord(iInstruction.getRt(),iInstruction.getRs(),iInstruction.getIm());
         }
 
         return "";
-    }
-
-    private String twoRegisterI(IInstruction iInstruction) {
-        return "$" + iInstruction.getRt() + ", $" + iInstruction.getRs() + ", " + iInstruction.getIm();
-    }
-
-    private String branchIInstruction(IInstruction iInstruction) {
-        short im = (short) iInstruction.getIm(); // Should be 16bits -18 (ints)
-        int signExtendedIm = im; // Java auto signextends
-
-        int address = PC + signExtendedIm * 4;
-
-        return "$" + iInstruction.getRs() + ", $" + iInstruction.getRt() + ", " + address;
-    }
-
-    private String branchOneRegisterI(IInstruction iInstruction) {
-        short im = (short) iInstruction.getIm(); // Should be 16bits
-        int signExtendedIm = im; // Java auto sign extends
-
-        int address = PC + signExtendedIm * 4;
-
-        return "$" + iInstruction.getRs() + ", " + address;
-    }
-
-    private String displacementIInstruction(IInstruction iInstruction) {
-        return "$" + iInstruction.getRt() + ", " + iInstruction.getIm() + "($" + iInstruction.getRs() + ")";
-    }
-
-    private String loadIInstruction(IInstruction iInstruction) {
-        return "$" + iInstruction.getRt() + ", " + iInstruction.getIm();
     }
 
     private String assemblyJInstruction() {
@@ -211,9 +157,9 @@ public class ControlUnit {
 
         switch (jInstruction.getOpcode()) {
             case 0x02: // 2
-                return "j " + address;
+                return alu.jump(address);
             case 0x03: // 3
-                return "jal " + address;
+                return alu.jumpAndLink(address);
         }
         return "";
     }
