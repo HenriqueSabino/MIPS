@@ -11,12 +11,14 @@ import model.instructions.RInstruction;
 public class ControlUnit {
 
     InstructionMemory instructionMemory;
+    ArithmeticLogicUnit alu;
     Instruction currentInstruction;
 
     int PC = 0x00000000;
 
     public ControlUnit() throws FileNotFoundException, IOException {
         instructionMemory = new InstructionMemory();
+        alu = new ArithmeticLogicUnit();
     }
 
     public boolean hasNextInstruction() {
@@ -57,7 +59,7 @@ public class ControlUnit {
 
         switch (rInstruction.getFunction()) {
             case 0x00:
-                return "sll " + shiftInstruction(rInstruction);
+                return alu.shiftLeftLogical(rInstruction.getRd(), rInstruction.getRt(), rInstruction.getShamt());
             case 0x02:
                 return "srl " + shiftInstruction(rInstruction);
             case 0x03:
@@ -69,7 +71,7 @@ public class ControlUnit {
             case 0x07:
                 return "srav " + variableShift(rInstruction);
             case 0x08:
-                return "jr " + jumopR(rInstruction);
+                return "jr " + jumpR(rInstruction);
             case 0x0c:
                 return "syscall";
             case 0x10:
@@ -127,7 +129,7 @@ public class ControlUnit {
         return "$" + rInstruction.getRd() + ", $" + rInstruction.getRt() + ", " + rInstruction.getShamt();
     }
 
-    private String jumopR(RInstruction rInstruction) {
+    private String jumpR(RInstruction rInstruction) {
         return "$" + rInstruction.getRs();
     }
 
@@ -139,9 +141,9 @@ public class ControlUnit {
             case 0x01: // 1
                 return "bltz " + branchOneRegisterI(iInstruction);
             case 0x04: // 4
-                return "beq " + banchIInstruction(iInstruction);
+                return "beq " + branchIInstruction(iInstruction);
             case 0x05: // 5
-                return "bne " + banchIInstruction(iInstruction);
+                return "bne " + branchIInstruction(iInstruction);
             case 0x08: // 8
                 return "addi " + twoRegisterI(iInstruction);
             case 0x09: // 9
@@ -175,8 +177,8 @@ public class ControlUnit {
         return "$" + iInstruction.getRt() + ", $" + iInstruction.getRs() + ", " + iInstruction.getIm();
     }
 
-    private String banchIInstruction(IInstruction iInstruction) {
-        short im = (short) iInstruction.getIm(); // Should be 16bits
+    private String branchIInstruction(IInstruction iInstruction) {
+        short im = (short) iInstruction.getIm(); // Should be 16bits -18 (ints)
         int signExtendedIm = im; // Java auto signextends
 
         int address = PC + signExtendedIm * 4;
