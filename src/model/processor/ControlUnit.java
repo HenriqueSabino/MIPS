@@ -73,12 +73,20 @@ public class ControlUnit {
                 return "sllv " + variableShift(rInstruction);
             case 0x06:
                 return "srlv " + variableShift(rInstruction);
+            case 0x07:
+                return "srav " + variableShift(rInstruction);
             case 0x08:
-                return "jr " + oneRegisterR(rInstruction);
+                return "jr " + jumopR(rInstruction);
+            case 0x0c:
+                return "syscall";
             case 0x10:
                 return "mfhi " + oneRegisterR(rInstruction);
             case 0x12:
                 return "mflo " + oneRegisterR(rInstruction);
+            case 0x18:
+                return "mult " + twoRegisterR(rInstruction);
+            case 0x19:
+                return "multu " + twoRegisterR(rInstruction);
             case 0x1a:
                 return "div " + twoRegisterR(rInstruction);
             case 0x1b:
@@ -103,7 +111,7 @@ public class ControlUnit {
                 return "slt " + threeRegisterR(rInstruction);
 
         }
-        return "";
+        return Integer.toHexString(rInstruction.getFunction());
     }
 
     private String threeRegisterR(RInstruction rInstruction) {
@@ -123,59 +131,70 @@ public class ControlUnit {
     }
 
     private String shiftInstruction(RInstruction rInstruction) {
-        return "$" + rInstruction.getRd() + ", $" + rInstruction.getRs() + ", " + rInstruction.getShamt();
+        return "$" + rInstruction.getRd() + ", $" + rInstruction.getRt() + ", " + rInstruction.getShamt();
+    }
+
+    private String jumopR(RInstruction rInstruction) {
+        return "$" + rInstruction.getRs();
     }
 
     private String assemblyIInstruction() {
 
         IInstruction iInstruction = (IInstruction) currentInstruction;
-        
-        switch(iInstruction.getOpcode()){
-            case 0x01:    // 1
-                return "bltz " + oneRegisterI(iInstruction);
-            case 0x04   : // 4
-                return "beq " + twoRegisterI(iInstruction);
-            case 0x05:    // 5
-                return "bne " + twoRegisterI(iInstruction);
-            case 0x08:    // 8
+
+        switch (iInstruction.getOpcode()) {
+            case 0x01: // 1
+                return "bltz " + branchOneRegisterI(iInstruction);
+            case 0x04: // 4
+                return "beq " + banchIInstruction(iInstruction);
+            case 0x05: // 5
+                return "bne " + banchIInstruction(iInstruction);
+            case 0x08: // 8
                 return "addi " + twoRegisterI(iInstruction);
-            case 0x09:    // 9
+            case 0x09: // 9
                 return "addiu " + twoRegisterI(iInstruction);
-            case 0x0a:    //10
+            case 0x0a: // 10
                 return "slti " + twoRegisterI(iInstruction);
-            case 0x0c:    //12
+            case 0x0c: // 12
                 return "andi " + twoRegisterI(iInstruction);
-            case 0x0d:    //13
-                return "ori "+ twoRegisterI(iInstruction);
-            case 0x0e:    //14
+            case 0x0d: // 13
+                return "ori " + twoRegisterI(iInstruction);
+            case 0x0e: // 14
                 return "xori " + twoRegisterI(iInstruction);
-            case 0x0f:    //15
-                return "lui " + oneRegisterI(iInstruction);
-            case 0x32:    //32
+            case 0x0f: // 15
+                return "lui " + loadIInstruction(iInstruction);
+            case 0x20: // 32
                 return "lb " + displacementIInstruction(iInstruction);
-            case 0x23:    //35
+            case 0x23: // 35
                 return "lw " + displacementIInstruction(iInstruction);
-            case 0x24:    //36
+            case 0x24: // 36
                 return "lbu " + displacementIInstruction(iInstruction);
-            case 0x28:    //40
+            case 0x28: // 40
                 return "sb" + displacementIInstruction(iInstruction);
-            case 0x2b:    //43
+            case 0x2b: // 43
                 return "sw " + displacementIInstruction(iInstruction);
         }
 
-
-        return "";
+        return Integer.toHexString(iInstruction.getOpcode());
     }
 
     private String twoRegisterI(IInstruction iInstruction) {
+        return "$" + iInstruction.getRt() + ", $" + iInstruction.getRs() + ", " + iInstruction.getIm();
+    }
+
+    private String banchIInstruction(IInstruction iInstruction) {
         return "$" + iInstruction.getRs() + ", $" + iInstruction.getRt() + ", " + iInstruction.getIm();
     }
 
-    private String displacementIInstruction(IInstruction iInstruction) {
-        return "$" + iInstruction.getRs() + ", " + iInstruction.getIm() + "(" + iInstruction.getRt() + ")";
+    private String branchOneRegisterI(IInstruction iInstruction) {
+        return "$" + iInstruction.getRs() + ", " + iInstruction.getIm();
     }
 
-    private String oneRegisterI(IInstruction iInstruction) {
+    private String displacementIInstruction(IInstruction iInstruction) {
+        return "$" + iInstruction.getRt() + ", " + iInstruction.getIm() + "($" + iInstruction.getRs() + ")";
+    }
+
+    private String loadIInstruction(IInstruction iInstruction) {
         return "$" + iInstruction.getRt() + ", " + iInstruction.getIm();
     }
 
@@ -183,7 +202,7 @@ public class ControlUnit {
 
         JInstruction jInstruction = (JInstruction) currentInstruction;
 
-        switch(jInstruction.getOpcode()){
+        switch (jInstruction.getOpcode()) {
             case 0x02: // 2
                 return "";
             case 0x03: // 3

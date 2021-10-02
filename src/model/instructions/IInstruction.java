@@ -15,7 +15,7 @@ public class IInstruction extends Instruction {
 
     // Retorna o Registrador de origem 1 da instrução
     public int getRs() {
-        return (getInstruction() & 0x03600000) >> 21;
+        return (getInstruction() & 0x03E00000) >> 21;
     }
 
     // Retorna o Registrador de origem 2 da instrução
