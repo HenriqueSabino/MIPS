@@ -1,8 +1,9 @@
 package model.processor;
 
+// Performa as operações lógicas e aritméticas do processador
 public class ArithmeticLogicUnit {
 
-    //Rinstructions
+    // Rinstructions
     public String shiftLeftLogical(int rd, int rt, int shamt) {
         return "sll $" + rd + ", $" + rt + ", " + shamt;
     }
@@ -31,7 +32,7 @@ public class ArithmeticLogicUnit {
         return "jr $" + rs;
     }
 
-    public String systemCall(){
+    public String systemCall() {
         return "syscall";
     }
 
@@ -95,80 +96,72 @@ public class ArithmeticLogicUnit {
         return "slt $" + rd + ", $" + rs + ", $" + rt;
     }
 
-    //Iinstructions
-    public int address(int im, int pc){
-        short imAux = (short) im; // Should be 16bits
-        int signExtendedIm = imAux; // Java auto sign extends
-
-        return pc + signExtendedIm * 4;
+    public String branchLessThanZero(int rs, int im, int pc) {
+        return "bltz $" + rs + ", " + im;
     }
 
-    public String branchLessThanZero(int rs, int im, int pc){
-        return "bltz $" + rs + ", " + address(im, pc);
+    public String branchEqual(int rs, int rt, int im, int pc) {
+        return "beq $" + rs + ", $" + rt + ", " + im;
     }
 
-    public String branchEqual(int rs, int rt, int im, int pc){
-        return "beq $" + rs + ", $" + rt + ", " + address(im, pc);
+    public String branchNotEqual(int rs, int rt, int im, int pc) {
+        return "bne $" + rs + ", $" + rt + ", " + im;
     }
 
-    public String branchNotEqual(int rs, int rt, int im, int pc){
-        return "bne $" + rs + ", $" + rt + ", " + address(im, pc);
-    }
-
-    public String addImmediate(int rt, int rs, int im){
+    public String addImmediate(int rt, int rs, int im) {
         return "addi $" + rt + ", $" + rs + ", " + im;
     }
 
-    public String addImmediateUnsigned(int rt, int rs, int im){
+    public String addImmediateUnsigned(int rt, int rs, int im) {
         return "addiu $" + rt + ", $" + rs + ", " + im;
     }
 
-    public String setLessThanImmediate(int rt, int rs, int im){
+    public String setLessThanImmediate(int rt, int rs, int im) {
         return "slti $" + rt + ", $" + rs + ", " + im;
     }
 
-    public String bitwiseAndImmediate(int rt, int rs, int im){
+    public String bitwiseAndImmediate(int rt, int rs, int im) {
         return "andi $" + rt + ", $" + rs + ", " + im;
     }
 
-    public String bitwiseOrImmediate(int rt, int rs, int im){
+    public String bitwiseOrImmediate(int rt, int rs, int im) {
         return "ori $" + rt + ", $" + rs + ", " + im;
     }
 
-    public String bitwiseXorImmediate(int rt, int rs, int im){
+    public String bitwiseXorImmediate(int rt, int rs, int im) {
         return "xori $" + rt + ", $" + rs + ", " + im;
     }
 
-    public String loadUpperImmediate(int rt, int im){
+    public String loadUpperImmediate(int rt, int im) {
         return "lui $" + rt + ", " + im;
     }
 
-    public String loadByte(int rt, int rs, int im){
+    public String loadByte(int rt, int rs, int im) {
         return "lb $" + rt + ", " + im + "($" + rs + ")";
     }
 
-    public String loadWord(int rt, int rs, int im){
+    public String loadWord(int rt, int rs, int im) {
         return "lw $" + rt + ", " + im + "($" + rs + ")";
     }
 
-    public String loadByteUnsigned(int rt, int rs, int im){
+    public String loadByteUnsigned(int rt, int rs, int im) {
         return "lbu $" + rt + ", " + im + "($" + rs + ")";
     }
 
-    public String storeByte(int rt, int rs, int im){
+    public String storeByte(int rt, int rs, int im) {
         return "sb $" + rt + ", " + im + "($" + rs + ")";
     }
 
-    public String storeWord(int rt, int rs, int im){
+    public String storeWord(int rt, int rs, int im) {
         return "sw $" + rt + ", " + im + "($" + rs + ")";
     }
 
-    //Jinstructions
-    public String jump(int address){
+    // Jinstructions
+    public String jump(int address) {
         return "j " + address;
     }
 
-    public String jumpAndLink(int address){
+    public String jumpAndLink(int address) {
         return "jal " + address;
     }
 }

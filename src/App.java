@@ -9,17 +9,26 @@ public class App {
 
         ControlUnit cu = new ControlUnit();
 
-        File out = new File("out.txt");
+        File out = new File("saida.txt");
         FileWriter fw = new FileWriter(out);
         BufferedWriter bw = new BufferedWriter(fw);
 
+        boolean firstLine = true;
+
         while (true) {
-            cu.readInstruction();
+            String output = cu.runInstruction();
 
-            if (!cu.hasNextInstruction())
+            if (!output.isBlank()) {
+
+                if (firstLine) {
+                    firstLine = false;
+                } else {
+                    bw.write('\n');
+                }
+
+                bw.write(output);
+            } else
                 break;
-
-            bw.write(cu.assemblyInstruction() + "\n");
         }
 
         bw.close();

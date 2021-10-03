@@ -1,5 +1,6 @@
 package model.instructions;
 
+// Molde das instruções tipo I
 public class IInstruction extends Instruction {
 
     // 000000 00000 00000 0000000000000000

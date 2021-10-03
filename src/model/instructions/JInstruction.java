@@ -1,5 +1,6 @@
 package model.instructions;
 
+// Molde das instruções tipo J
 public class JInstruction extends Instruction {
 
     // 000000 00000000000000000000000000

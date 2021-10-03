@@ -1,5 +1,6 @@
 package model.instructions;
 
+// Molde das instruções tipo R
 public class RInstruction extends Instruction {
 
     // 000000 00000 00000 00000 00000 000000

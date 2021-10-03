@@ -1,6 +1,6 @@
 package model.instructions;
 
-// Classe abstrata que define que uma instrução deve ao menos ter um código de operação
+// Classe que define que uma instrução deve ao menos ter um código de operação
 public class Instruction {
 
     private int instruction;

@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+// Lê as instruções do programa e armazena na memória
 public class InstructionMemory {
 
     private File instructionFile;
