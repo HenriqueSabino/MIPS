@@ -18,7 +18,7 @@ public class App {
         while (true) {
             String output = cu.runInstruction();
 
-            if (!output.isBlank()) {
+            if (!output.isEmpty()) {
 
                 if (firstLine) {
                     firstLine = false;
