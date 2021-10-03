@@ -129,29 +129,35 @@ public class ControlUnit {
                 return alu.branchNotEqual(iInstruction.getRs(), iInstruction.getRt(), address(iInstruction.getIm()),
                         PC);
             case 0x08: // 8
-                return alu.addImmediate(iInstruction.getRt(), iInstruction.getRs(), iInstruction.getIm());
+                return alu.addImmediate(iInstruction.getRt(), iInstruction.getRs(), signExtend(iInstruction.getIm()));
             case 0x09: // 9
-                return alu.addImmediateUnsigned(iInstruction.getRt(), iInstruction.getRs(), iInstruction.getIm());
+                return alu.addImmediateUnsigned(iInstruction.getRt(), iInstruction.getRs(),
+                        signExtend(iInstruction.getIm()));
             case 0x0a: // 10
-                return alu.setLessThanImmediate(iInstruction.getRt(), iInstruction.getRs(), iInstruction.getIm());
+                return alu.setLessThanImmediate(iInstruction.getRt(), iInstruction.getRs(),
+                        signExtend(iInstruction.getIm()));
             case 0x0c: // 12
-                return alu.bitwiseAndImmediate(iInstruction.getRt(), iInstruction.getRs(), iInstruction.getIm());
+                return alu.bitwiseAndImmediate(iInstruction.getRt(), iInstruction.getRs(),
+                        signExtend(iInstruction.getIm()));
             case 0x0d: // 13
-                return alu.bitwiseOrImmediate(iInstruction.getRt(), iInstruction.getRs(), iInstruction.getIm());
+                return alu.bitwiseOrImmediate(iInstruction.getRt(), iInstruction.getRs(),
+                        signExtend(iInstruction.getIm()));
             case 0x0e: // 14
-                return alu.bitwiseXorImmediate(iInstruction.getRt(), iInstruction.getRs(), iInstruction.getIm());
+                return alu.bitwiseXorImmediate(iInstruction.getRt(), iInstruction.getRs(),
+                        signExtend(iInstruction.getIm()));
             case 0x0f: // 15
-                return alu.loadUpperImmediate(iInstruction.getRt(), iInstruction.getIm());
+                return alu.loadUpperImmediate(iInstruction.getRt(), signExtend(iInstruction.getIm()));
             case 0x20: // 32
-                return alu.loadByte(iInstruction.getRt(), iInstruction.getRs(), iInstruction.getIm());
+                return alu.loadByte(iInstruction.getRt(), iInstruction.getRs(), signExtend(iInstruction.getIm()));
             case 0x23: // 35
-                return alu.loadWord(iInstruction.getRt(), iInstruction.getRs(), iInstruction.getIm());
+                return alu.loadWord(iInstruction.getRt(), iInstruction.getRs(), signExtend(iInstruction.getIm()));
             case 0x24: // 36
-                return alu.loadByteUnsigned(iInstruction.getRt(), iInstruction.getRs(), iInstruction.getIm());
+                return alu.loadByteUnsigned(iInstruction.getRt(), iInstruction.getRs(),
+                        signExtend(iInstruction.getIm()));
             case 0x28: // 40
-                return alu.storeByte(iInstruction.getRt(), iInstruction.getRs(), iInstruction.getIm());
+                return alu.storeByte(iInstruction.getRt(), iInstruction.getRs(), signExtend(iInstruction.getIm()));
             case 0x2b: // 43
-                return alu.storeWord(iInstruction.getRt(), iInstruction.getRs(), iInstruction.getIm());
+                return alu.storeWord(iInstruction.getRt(), iInstruction.getRs(), signExtend(iInstruction.getIm()));
         }
 
         return "";
@@ -159,10 +165,12 @@ public class ControlUnit {
 
     // Calcula os endereços de instruções de desvio
     public int address(int im) {
-        short imAux = (short) im; // 16bits
-        int signExtendedIm = imAux; // Java extende o sinal automaticamente nesse cast
+        return PC + signExtend(im) * 4;
+    }
 
-        return PC + signExtendedIm * 4;
+    private int signExtend(int im) {
+        short imShort = (short) im; // 16bits
+        return imShort; // Java extende o sinal automaticamente nesse cast
     }
 
     private String runJInstruction() {
