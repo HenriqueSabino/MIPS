@@ -16,9 +16,9 @@ public class InstructionMemory {
     private BufferedReader br;
     private List<Byte> instructionMemory;
 
-    public InstructionMemory() throws FileNotFoundException, IOException {
+    public InstructionMemory(String inputMemotyPath) throws FileNotFoundException, IOException {
 
-        instructionFile = new File("entrada.txt");
+        instructionFile = new File(inputMemotyPath);
         fr = new FileReader(instructionFile);
         br = new BufferedReader(fr);
         instructionMemory = new ArrayList<>();

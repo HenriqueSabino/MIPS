@@ -17,8 +17,8 @@ public class ControlUnit {
 
     int PC = 0x00000000; // ponteiro da instrução atual
 
-    public ControlUnit() throws FileNotFoundException, IOException {
-        instructionMemory = new InstructionMemory();
+    public ControlUnit(String inputMemotyPath) throws FileNotFoundException, IOException {
+        instructionMemory = new InstructionMemory(inputMemotyPath);
         alu = new ArithmeticLogicUnit();
     }
 
