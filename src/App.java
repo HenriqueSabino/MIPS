@@ -4,6 +4,7 @@ import java.io.FileWriter;
 import java.util.Scanner;
 
 import model.processor.ControlUnit;
+import model.processor.MIPS;
 
 public class App {
     public static void main(String[] args) throws Exception {
@@ -13,7 +14,7 @@ public class App {
         System.out.println("Digite o caminho para o arquivo de entrada:");
         String input = scanner.nextLine();
 
-        ControlUnit cu = new ControlUnit(input);
+        MIPS mips = new MIPS(input);
 
         System.out.println("Digite o caminho para o arquivo de saída:");
         input = scanner.nextLine();
@@ -25,7 +26,8 @@ public class App {
         boolean firstLine = true;
 
         while (true) {
-            String output = cu.runInstruction();
+            mips.runInstruction();
+            String output = mips.currentInstruction();
 
             if (!output.isEmpty()) {
 
@@ -35,6 +37,7 @@ public class App {
                     bw.write('\n');
                 }
 
+                output += "\n" + mips.registerDump();
                 bw.write(output);
             } else
                 break;

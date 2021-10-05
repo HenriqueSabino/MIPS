@@ -5,25 +5,26 @@ import model.instructions.Instruction;
 import model.instructions.JInstruction;
 import model.instructions.RInstruction;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-
 // Controla o fluxo dos dados do processador
 public class ControlUnit {
 
-    InstructionMemory instructionMemory;
-    ArithmeticLogicUnit alu;
-    Instruction currentInstruction;
+    private InstructionMemory instructionMemory;
+    private ArithmeticLogicUnit alu;
+    private RegisterBank registerBank;
+    private Instruction currentInstruction;
+    private String currentInstructionStr;
 
     int PC = 0x00000000; // ponteiro da instrução atual
 
-    public ControlUnit(String inputMemotyPath) throws FileNotFoundException, IOException {
-        instructionMemory = new InstructionMemory(inputMemotyPath);
-        alu = new ArithmeticLogicUnit();
+    public ControlUnit(RegisterBank registerBank, InstructionMemory instructionMemory, ArithmeticLogicUnit alu) {
+
+        this.instructionMemory = instructionMemory;
+        this.alu = alu;
+        this.registerBank = registerBank;
     }
 
     // Roda as instruções lidas na memória
-    public String runInstruction() {
+    public void runInstruction() {
 
         try {
             int instruction = Byte.toUnsignedInt(instructionMemory.getInstructionMemory().get(PC));
@@ -38,129 +39,206 @@ public class ControlUnit {
 
             if (currentInstruction != null) {
                 PC += 4; // Próxima instrução
-                return run();
-            } else {
-                return "";
+                run();
             }
 
         } catch (Exception e) {
             currentInstruction = null;
-            return "";
         }
     }
 
-    private String run() {
+    private void run() {
         if (currentInstruction.getClass() == RInstruction.class) {
-            return runRInstruction();
+            runRInstruction();
         } else if (currentInstruction.getClass() == IInstruction.class) {
-            return runIInstruction();
+            runIInstruction();
         } else {
-            return runJInstruction();
+            runJInstruction();
         }
     }
 
-    private String runRInstruction() {
+    private void runRInstruction() {
 
         RInstruction rInstruction = (RInstruction) currentInstruction;
+        int rd = rInstruction.getRd();
+        int rs = rInstruction.getRs();
+        int rt = rInstruction.getRs();
+        int shamt = rInstruction.getShamt();
 
         switch (rInstruction.getFunction()) {
             case 0x00:
-                return alu.shiftLeftLogical(rInstruction.getRd(), rInstruction.getRt(), rInstruction.getShamt());
-            case 0x02:
-                return alu.shiftRightLogical(rInstruction.getRd(), rInstruction.getRt(), rInstruction.getShamt());
-            case 0x03:
-                return alu.shiftRightArithmetic(rInstruction.getRd(), rInstruction.getRt(), rInstruction.getShamt());
-            case 0x04:
-                return alu.shiftLeftLogicalVariable(rInstruction.getRd(), rInstruction.getRt(), rInstruction.getRs());
-            case 0x06:
-                return alu.shiftRightLogicalVariable(rInstruction.getRd(), rInstruction.getRt(), rInstruction.getRs());
-            case 0x07:
-                return alu.shiftRightArithmeticVariable(rInstruction.getRd(), rInstruction.getRt(),
-                        rInstruction.getRs());
-            case 0x08:
-                return alu.jumpRegister(rInstruction.getRs());
-            case 0x0c:
-                return alu.systemCall();
-            case 0x10:
-                return alu.moveFromHI(rInstruction.getRd());
-            case 0x12:
-                return alu.moveFromLO(rInstruction.getRd());
-            case 0x18:
-                return alu.multiply(rInstruction.getRs(), rInstruction.getRt());
-            case 0x19:
-                return alu.multiplyUnsigned(rInstruction.getRs(), rInstruction.getRt());
-            case 0x1a:
-                return alu.divide(rInstruction.getRs(), rInstruction.getRt());
-            case 0x1b:
-                return alu.divideUnsigned(rInstruction.getRs(), rInstruction.getRt());
-            case 0x20:
-                return alu.add(rInstruction.getRd(), rInstruction.getRs(), rInstruction.getRt());
-            case 0x21:
-                return alu.addUnsigned(rInstruction.getRd(), rInstruction.getRs(), rInstruction.getRt());
-            case 0x22:
-                return alu.subtract(rInstruction.getRd(), rInstruction.getRs(), rInstruction.getRt());
-            case 0x23:
-                return alu.subtractUnsigned(rInstruction.getRd(), rInstruction.getRs(), rInstruction.getRt());
-            case 0x24:
-                return alu.bitwiseAnd(rInstruction.getRd(), rInstruction.getRs(), rInstruction.getRt());
-            case 0x25:
-                return alu.bitwiseOr(rInstruction.getRd(), rInstruction.getRs(), rInstruction.getRt());
-            case 0x26:
-                return alu.bitwiseExclusiveOr(rInstruction.getRd(), rInstruction.getRs(), rInstruction.getRt());
-            case 0x27:
-                return alu.bitwiseNor(rInstruction.getRd(), rInstruction.getRs(), rInstruction.getRt());
-            case 0x2a:
-                return alu.setLessThan(rInstruction.getRd(), rInstruction.getRs(), rInstruction.getRt());
+                currentInstructionStr = "sll $" + rd + ", $" + rt + ", " + shamt;
 
+                registerBank.setRegister(rInstruction.getRd(),
+                        alu.shiftLeftLogical(registerBank.getRegister(rt), registerBank.getRegister(shamt)));
+                break;
+            case 0x02:
+                currentInstructionStr = "srl $" + rd + ", $" + rt + ", " + shamt;
+
+                registerBank.setRegister(rd,
+                        alu.shiftRightLogical(registerBank.getRegister(rt), registerBank.getRegister(shamt)));
+                break;
+            case 0x03:
+                currentInstructionStr = "sra $" + rd + ", $" + rt + ", " + shamt;
+
+                registerBank.setRegister(rd,
+                        alu.shiftRightArithmetic(registerBank.getRegister(rt), registerBank.getRegister(shamt)));
+                break;
+            case 0x04:
+                currentInstructionStr = "sllv $" + rd + ", $" + rt + ", $" + rs;
+
+                registerBank.setRegister(rd,
+                        alu.shiftLeftLogicalVariable(registerBank.getRegister(rt), registerBank.getRegister(rs)));
+                break;
+            case 0x06:
+                currentInstructionStr = "srlv $" + rd + ", $" + rt + ", $" + rs;
+
+                registerBank.setRegister(rd,
+                        alu.shiftRightLogicalVariable(registerBank.getRegister(rt), registerBank.getRegister(rs)));
+                break;
+            case 0x07:
+                currentInstructionStr = "srav $" + rd + ", $" + rt + ", $" + rs;
+
+                registerBank.setRegister(rd,
+                        alu.shiftRightArithmeticVariable(registerBank.getRegister(rt), registerBank.getRegister(rs)));
+                break;
+            case 0x08:
+                currentInstructionStr = "jr $" + rs;
+                break;
+            case 0x0c:
+                currentInstructionStr = "syscall";
+                break;
+            case 0x10:
+                currentInstructionStr = "mfhi $" + rd;
+                // TODO
+                break;
+            case 0x12:
+                currentInstructionStr = "mflo $" + rd;
+                // TODO
+                break;
+            case 0x18:
+                currentInstructionStr = "mult $" + rs + ", $" + rt;
+
+                long result = alu.multiply(registerBank.getRegister(rs), registerBank.getRegister(rt));
+                // TODO: set HI and LO
+                break;
+            case 0x19:
+                currentInstructionStr = "multu $" + rs + ", $" + rt;
+
+                result = alu.multiplyUnsigned(registerBank.getRegister(rs), registerBank.getRegister(rt));
+                // TODO: set HI and LO
+                break;
+            case 0x1a:
+                currentInstructionStr = "div $" + rs + ", $" + rt;
+
+                alu.divide(registerBank.getRegister(rs), registerBank.getRegister(rt));
+                // TODO
+                break;
+            case 0x1b:
+                currentInstructionStr = "divu $" + rs + ", $" + rt;
+
+                alu.divideUnsigned(registerBank.getRegister(rs), registerBank.getRegister(rt));
+                // TODO
+                break;
+            case 0x20:
+                currentInstructionStr = "add $" + rd + ", $" + rs + ", $" + rt;
+
+                registerBank.setRegister(rd, alu.add(registerBank.getRegister(rs), registerBank.getRegister(rt)));
+                break;
+            case 0x21:
+                currentInstructionStr = "addu $" + rd + ", $" + rs + ", $" + rt;
+
+                registerBank.setRegister(rd,
+                        alu.addUnsigned(registerBank.getRegister(rs), registerBank.getRegister(rt)));
+                break;
+            case 0x22:
+                currentInstructionStr = "sub $" + rd + ", $" + rs + ", $" + rt;
+                registerBank.setRegister(rd, alu.subtract(registerBank.getRegister(rs), registerBank.getRegister(rt)));
+                break;
+            case 0x23:
+                currentInstructionStr = "sub $" + rd + ", $" + rs + ", $" + rt;
+                registerBank.setRegister(rd,
+                        alu.subtractUnsigned(registerBank.getRegister(rs), registerBank.getRegister(rt)));
+                break;
+            case 0x24:
+                currentInstructionStr = "and $" + rd + ", $" + rs + ", $" + rt;
+                registerBank.setRegister(rd,
+                        alu.bitwiseAnd(registerBank.getRegister(rs), registerBank.getRegister(rt)));
+                break;
+            case 0x25:
+                currentInstructionStr = "or $" + rd + ", $" + rs + ", $" + rt;
+                registerBank.setRegister(rd, alu.bitwiseOr(registerBank.getRegister(rs), registerBank.getRegister(rt)));
+                break;
+            case 0x26:
+                currentInstructionStr = "xor $" + rd + ", $" + rs + ", $" + rt;
+                registerBank.setRegister(rd,
+                        alu.bitwiseExclusiveOr(registerBank.getRegister(rs), registerBank.getRegister(rt)));
+                break;
+            case 0x27:
+                currentInstructionStr = "nor $" + rd + ", $" + rs + ", $" + rt;
+                registerBank.setRegister(rd,
+                        alu.bitwiseNor(registerBank.getRegister(rs), registerBank.getRegister(rt)));
+                break;
+            case 0x2a:
+                currentInstructionStr = "slt $" + rd + ", $" + rs + ", $" + rt;
+
+                registerBank.setRegister(rd,
+                        alu.setLessThan(registerBank.getRegister(rs), registerBank.getRegister(rt)));
+                break;
         }
-        return "";
     }
 
-    private String runIInstruction() {
+    private void runIInstruction() {
 
         IInstruction iInstruction = (IInstruction) currentInstruction;
 
         switch (iInstruction.getOpcode()) {
             case 0x01: // 1
-                return alu.branchLessThanZero(iInstruction.getRs(), address(iInstruction.getIm()), PC);
+                alu.branchLessThanZero(iInstruction.getRs(), address(iInstruction.getIm()));
+                break;
             case 0x04: // 4
-                return alu.branchEqual(iInstruction.getRs(), iInstruction.getRt(), address(iInstruction.getIm()), PC);
+                alu.branchEqual(iInstruction.getRs(), iInstruction.getRt(), address(iInstruction.getIm()));
+                break;
             case 0x05: // 5
-                return alu.branchNotEqual(iInstruction.getRs(), iInstruction.getRt(), address(iInstruction.getIm()),
-                        PC);
+                alu.branchNotEqual(iInstruction.getRs(), iInstruction.getRt(), address(iInstruction.getIm()));
+                break;
             case 0x08: // 8
-                return alu.addImmediate(iInstruction.getRt(), iInstruction.getRs(), signExtend(iInstruction.getIm()));
+                alu.addImmediate(iInstruction.getRt(), iInstruction.getRs(), signExtend(iInstruction.getIm()));
+                break;
             case 0x09: // 9
-                return alu.addImmediateUnsigned(iInstruction.getRt(), iInstruction.getRs(),
-                        signExtend(iInstruction.getIm()));
+                alu.addImmediateUnsigned(iInstruction.getRt(), iInstruction.getRs(), signExtend(iInstruction.getIm()));
+                break;
             case 0x0a: // 10
-                return alu.setLessThanImmediate(iInstruction.getRt(), iInstruction.getRs(),
-                        signExtend(iInstruction.getIm()));
+                alu.setLessThanImmediate(iInstruction.getRt(), iInstruction.getRs(), signExtend(iInstruction.getIm()));
+                break;
             case 0x0c: // 12
-                return alu.bitwiseAndImmediate(iInstruction.getRt(), iInstruction.getRs(),
-                        signExtend(iInstruction.getIm()));
+                alu.bitwiseAndImmediate(iInstruction.getRt(), iInstruction.getRs(), signExtend(iInstruction.getIm()));
+                break;
             case 0x0d: // 13
-                return alu.bitwiseOrImmediate(iInstruction.getRt(), iInstruction.getRs(),
-                        signExtend(iInstruction.getIm()));
+                alu.bitwiseOrImmediate(iInstruction.getRt(), iInstruction.getRs(), signExtend(iInstruction.getIm()));
+                break;
             case 0x0e: // 14
-                return alu.bitwiseXorImmediate(iInstruction.getRt(), iInstruction.getRs(),
-                        signExtend(iInstruction.getIm()));
+                alu.bitwiseXorImmediate(iInstruction.getRt(), iInstruction.getRs(), signExtend(iInstruction.getIm()));
+                break;
             case 0x0f: // 15
-                return alu.loadUpperImmediate(iInstruction.getRt(), signExtend(iInstruction.getIm()));
+                alu.loadUpperImmediate(iInstruction.getRt(), signExtend(iInstruction.getIm()));
+                break;
             case 0x20: // 32
-                return alu.loadByte(iInstruction.getRt(), iInstruction.getRs(), signExtend(iInstruction.getIm()));
+                alu.loadByte(iInstruction.getRt(), iInstruction.getRs(), signExtend(iInstruction.getIm()));
+                break;
             case 0x23: // 35
-                return alu.loadWord(iInstruction.getRt(), iInstruction.getRs(), signExtend(iInstruction.getIm()));
+                alu.loadWord(iInstruction.getRt(), iInstruction.getRs(), signExtend(iInstruction.getIm()));
+                break;
             case 0x24: // 36
-                return alu.loadByteUnsigned(iInstruction.getRt(), iInstruction.getRs(),
-                        signExtend(iInstruction.getIm()));
+                alu.loadByteUnsigned(iInstruction.getRt(), iInstruction.getRs(), signExtend(iInstruction.getIm()));
+                break;
             case 0x28: // 40
-                return alu.storeByte(iInstruction.getRt(), iInstruction.getRs(), signExtend(iInstruction.getIm()));
+                alu.storeByte(iInstruction.getRt(), iInstruction.getRs(), signExtend(iInstruction.getIm()));
+                break;
             case 0x2b: // 43
-                return alu.storeWord(iInstruction.getRt(), iInstruction.getRs(), signExtend(iInstruction.getIm()));
+                alu.storeWord(iInstruction.getRt(), iInstruction.getRs(), signExtend(iInstruction.getIm()));
+                break;
         }
-
-        return "";
     }
 
     // Calcula os endereços de instruções de desvio
@@ -173,7 +251,7 @@ public class ControlUnit {
         return imShort; // Java extende o sinal automaticamente nesse cast
     }
 
-    private String runJInstruction() {
+    private void runJInstruction() {
 
         JInstruction jInstruction = (JInstruction) currentInstruction;
 
@@ -182,11 +260,12 @@ public class ControlUnit {
 
         switch (jInstruction.getOpcode()) {
             case 0x02: // 2
-                return "j " + address;
+                currentInstructionStr = "j " + address;
+                break;
             case 0x03: // 3
-                return "jal " + address;
+                currentInstructionStr = "jal " + address;
+                break;
         }
-        return "";
     }
 
     private void decodeInstruction(int instruction) {
