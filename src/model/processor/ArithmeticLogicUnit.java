@@ -3,60 +3,112 @@ package model.processor;
 // Performa as operações lógicas e aritméticas do processador
 public class ArithmeticLogicUnit {
 
+    private RegisterBank registerBank;
+
+    public ArithmeticLogicUnit(RegisterBank registerBank) {
+        this.registerBank = registerBank;
+    }
+
     // Rinstructions
     public int shiftLeftLogical(int rt, int shamt) {
+
+        rt = registerBank.getRegister(rt);
         return rt << shamt;
     }
 
     public int shiftRightLogical(int rt, int shamt) {
+
+        rt = registerBank.getRegister(rt);
         return rt >>> shamt;
     }
 
     public int shiftRightArithmetic(int rt, int shamt) {
+
+        rt = registerBank.getRegister(rt);
         return rt >> shamt;
     }
 
     public int shiftLeftLogicalVariable(int rt, int rs) {
+
+        rt = registerBank.getRegister(rt);
+        rs = registerBank.getRegister(rs);
         return rt << rs;
     }
 
     public int shiftRightLogicalVariable(int rt, int rs) {
+
+        rt = registerBank.getRegister(rt);
+        rs = registerBank.getRegister(rs);
         return rt >>> rs;
     }
 
     public int shiftRightArithmeticVariable(int rt, int rs) {
+
+        rt = registerBank.getRegister(rt);
+        rs = registerBank.getRegister(rs);
         return rt >> rs;
     }
 
-    public long multiply(int rs, int rt) {
-        // TODO
-        return (long) rs * (long) rt;
+    public void multiply(int rs, int rt) {
+
+        rt = registerBank.getRegister(rt);
+        rs = registerBank.getRegister(rs);
+
+        long result = (long) rt * (long) rs;
+
+        registerBank.setHI((int) (result >>> 32));
+        registerBank.setLO((int) (result & 0xFFFFFFFF));
     }
 
-    public long multiplyUnsigned(int rs, int rt) {
+    public void multiplyUnsigned(int rs, int rt) {
 
-        // TODO
+        rt = registerBank.getRegister(rt);
+        rs = registerBank.getRegister(rs);
+
         long rsu = Integer.toUnsignedLong(rs);
         long rtu = Integer.toUnsignedLong(rt);
 
-        return rsu * rtu;
+        long result = rsu * rtu;
+
+        registerBank.setHI((int) (result >>> 32));
+        registerBank.setLO((int) (result & 0xFFFFFFFF));
     }
 
-    public int divide(int rs, int rt) {
-        // TODO
-        return rs / rt;
+    public void divide(int rs, int rt) {
+
+        rt = registerBank.getRegister(rt);
+        rs = registerBank.getRegister(rs);
+
+        if (rt != 0) {
+            registerBank.setLO(rs / rt);
+            registerBank.setHI(rs % rt);
+        }
     }
 
-    public int divideUnsigned(int rs, int rt) {
-        // TODO
-        return Integer.divideUnsigned(rs, rt);
+    public void divideUnsigned(int rs, int rt) {
+
+        rt = registerBank.getRegister(rt);
+        rs = registerBank.getRegister(rs);
+
+        if (rt != 0) {
+            registerBank.setLO((int) Long.divideUnsigned(rs, rt));
+            registerBank.setHI((int) Long.remainderUnsigned(rs, rt));
+        }
     }
 
     public int add(int rs, int rt) {
+
+        rt = registerBank.getRegister(rt);
+        rs = registerBank.getRegister(rs);
+
         return rs + rt;
     }
 
     public int addUnsigned(int rs, int rt) {
+
+        rt = registerBank.getRegister(rt);
+        rs = registerBank.getRegister(rs);
+
         long rsu = Integer.toUnsignedLong(rs);
         long rtu = Integer.toUnsignedLong(rt);
 
@@ -64,10 +116,21 @@ public class ArithmeticLogicUnit {
     }
 
     public int subtract(int rs, int rt) {
+
+        rt = registerBank.getRegister(rt);
+        rs = registerBank.getRegister(rs);
+
+        rt = registerBank.getRegister(rt);
+        rs = registerBank.getRegister(rs);
+
         return rs - rt;
     }
 
     public int subtractUnsigned(int rs, int rt) {
+
+        rt = registerBank.getRegister(rt);
+        rs = registerBank.getRegister(rs);
+
         long rsu = Integer.toUnsignedLong(rs);
         long rtu = Integer.toUnsignedLong(rt);
 
@@ -75,82 +138,97 @@ public class ArithmeticLogicUnit {
     }
 
     public int bitwiseAnd(int rs, int rt) {
+
+        rt = registerBank.getRegister(rt);
+        rs = registerBank.getRegister(rs);
+
         return rs & rt;
     }
 
     public int bitwiseOr(int rs, int rt) {
+
+        rt = registerBank.getRegister(rt);
+        rs = registerBank.getRegister(rs);
+
         return rs | rt;
     }
 
     public int bitwiseExclusiveOr(int rs, int rt) {
+
+        rt = registerBank.getRegister(rt);
+        rs = registerBank.getRegister(rs);
+
         return rs ^ rt;
     }
 
     public int bitwiseNor(int rs, int rt) {
+
+        rt = registerBank.getRegister(rt);
+        rs = registerBank.getRegister(rs);
+
         return ~(rs | rt);
     }
 
     public int setLessThan(int rs, int rt) {
+
+        rt = registerBank.getRegister(rt);
+        rs = registerBank.getRegister(rs);
+
         return (rs < rt) ? 1 : 0;
     }
 
     public void branchLessThanZero(int rs, int im) {
-        return "bltz $" + rs + ", " + im;
     }
 
     public void branchEqual(int rs, int rt, int im) {
-        return "beq $" + rs + ", $" + rt + ", " + im;
     }
 
     public void branchNotEqual(int rs, int rt, int im) {
-        return "bne $" + rs + ", $" + rt + ", " + im;
     }
 
-    public int addImmediate(int rt, int rs, int im) {
-        return "addi $" + rt + ", $" + rs + ", " + im;
+    public int addImmediate(int rs, int im) {
+        return registerBank.getRegister(rs) + im;
     }
 
-    public int addImmediateUnsigned(int rt, int rs, int im) {
-        return "addiu $" + rt + ", $" + rs + ", " + im;
+    public int addImmediateUnsigned(int rs, int im) {
+
+        long rsu = Integer.toUnsignedLong(registerBank.getRegister(rs));
+        long imu = Integer.toUnsignedLong(im);
+
+        return (int) (rsu + imu);
     }
 
-    public int setLessThanImmediate(int rt, int rs, int im) {
-        return "slti $" + rt + ", $" + rs + ", " + im;
+    public int setLessThanImmediate(int rs, int im) {
+        return (registerBank.getRegister(rs) < im) ? 1 : 0;
     }
 
-    public int bitwiseAndImmediate(int rt, int rs, int im) {
-        return "andi $" + rt + ", $" + rs + ", " + im;
+    public int bitwiseAndImmediate(int rs, int im) {
+        return registerBank.getRegister(rs) & im;
     }
 
-    public int bitwiseOrImmediate(int rt, int rs, int im) {
-        return "ori $" + rt + ", $" + rs + ", " + im;
+    public int bitwiseOrImmediate(int rs, int im) {
+        return registerBank.getRegister(rs) | im;
     }
 
-    public int bitwiseXorImmediate(int rt, int rs, int im) {
-        return "xori $" + rt + ", $" + rs + ", " + im;
+    public int bitwiseXorImmediate(int rs, int im) {
+        return registerBank.getRegister(rs) ^ im;
     }
 
-    public int loadUpperImmediate(int rt, int im) {
-        return "lui $" + rt + ", " + im;
+    public void loadUpperImmediate(int rt, int im) {
     }
 
-    public int loadByte(int rt, int rs, int im) {
-        return "lb $" + rt + ", " + im + "($" + rs + ")";
+    public void loadByte(int rt, int rs, int im) {
     }
 
-    public int loadWord(int rt, int rs, int im) {
-        return "lw $" + rt + ", " + im + "($" + rs + ")";
+    public void loadWord(int rt, int rs, int im) {
     }
 
-    public int loadByteUnsigned(int rt, int rs, int im) {
-        return "lbu $" + rt + ", " + im + "($" + rs + ")";
+    public void loadByteUnsigned(int rt, int rs, int im) {
     }
 
-    public int storeByte(int rt, int rs, int im) {
-        return "sb $" + rt + ", " + im + "($" + rs + ")";
+    public void storeByte(int rt, int rs, int im) {
     }
 
-    public int storeWord(int rt, int rs, int im) {
-        return "sw $" + rt + ", " + im + "($" + rs + ")";
+    public void storeWord(int rt, int rs, int im) {
     }
 }

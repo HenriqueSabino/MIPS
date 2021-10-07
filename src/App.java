@@ -3,7 +3,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.util.Scanner;
 
-import model.processor.ControlUnit;
 import model.processor.MIPS;
 
 public class App {
@@ -37,7 +36,12 @@ public class App {
                     bw.write('\n');
                 }
 
-                output += "\n" + mips.registerDump();
+                String dump = mips.registerDump();
+
+                if (!dump.isEmpty()) {
+                    output += "\n" + dump;
+                }
+
                 bw.write(output);
             } else
                 break;

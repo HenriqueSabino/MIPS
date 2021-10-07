@@ -13,7 +13,7 @@ public class MIPS {
     public MIPS(String instructionPath) throws FileNotFoundException, IOException {
 
         registerBank = new RegisterBank();
-        alu = new ArithmeticLogicUnit();
+        alu = new ArithmeticLogicUnit(registerBank);
         instructionMemory = new InstructionMemory(instructionPath);
         controlUnit = new ControlUnit(registerBank, instructionMemory, alu);
     }
@@ -23,10 +23,27 @@ public class MIPS {
     }
 
     public String currentInstruction() {
-        return "";
+        return controlUnit.getCurrentInstructionStr();
     }
 
     public String registerDump() {
-        return "";
+
+        StringBuilder sb = new StringBuilder();
+
+        if (controlUnit.getHasRegisterDump()) {
+            sb.append('[');
+
+            for (int i = 0; i < 32; i++) {
+
+                if (i != 0)
+                    sb.append(";");
+
+                sb.append("$" + i + "=" + registerBank.getRegister(i));
+            }
+
+            sb.append(']');
+        }
+
+        return sb.toString();
     }
 }
