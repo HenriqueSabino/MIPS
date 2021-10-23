@@ -37,9 +37,11 @@ public class InstructionMemory {
 
         String currentLine = br.readLine();
 
+        // Enquanto houver linhas a serem lidas
         while (currentLine != null) {
             int fullInstruction = Integer.parseUnsignedInt(currentLine.substring(2), 16);
 
+            // Codifica a instrução lida em bytes
             instructionMemory.add((byte) (fullInstruction >>> 24));
             instructionMemory.add((byte) ((fullInstruction & 0x00ff0000) >>> 16));
             instructionMemory.add((byte) ((fullInstruction & 0x0000ff00) >>> 8));

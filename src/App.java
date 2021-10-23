@@ -22,9 +22,11 @@ public class App {
 
         Scanner scanner = new Scanner(System.in);
 
+        // Lendo o caminho dos arquivos de entrada e saída
         System.out.println("Digite o caminho para o arquivo de entrada:");
         String input = scanner.nextLine();
 
+        // Inicializando o processador
         MIPS mips = new MIPS(input);
 
         System.out.println("Digite o caminho para o arquivo de saída:");
@@ -36,18 +38,21 @@ public class App {
 
         boolean firstLine = true;
 
+        // Executando as instruções lidas no arquivo de entrada
         while (true) {
             mips.runInstruction();
             String output = mips.currentInstruction();
 
             if (!output.isEmpty()) {
 
+                // Adiciona uma quebra de linha antes de cada linha, exceto na primeira
                 if (firstLine) {
                     firstLine = false;
                 } else {
                     bw.write('\n');
                 }
 
+                // Imprime o dump dos registradores caso haja
                 String dump = mips.registerDump();
 
                 if (!dump.isEmpty()) {

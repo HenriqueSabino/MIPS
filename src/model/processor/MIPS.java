@@ -15,7 +15,7 @@ package model.processor;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-// Builda a string que vai ser retornada no arquivo de saida
+// Define o processador MIPS
 public class MIPS {
 
     RegisterBank registerBank;
@@ -23,6 +23,7 @@ public class MIPS {
     InstructionMemory instructionMemory;
     ControlUnit controlUnit;
 
+    // Inicializando partes do processador
     public MIPS(String instructionPath) throws FileNotFoundException, IOException {
 
         registerBank = new RegisterBank();
@@ -31,14 +32,18 @@ public class MIPS {
         controlUnit = new ControlUnit(registerBank, instructionMemory, alu);
     }
 
+    // Executa a próxima instrução
     public void runInstruction() {
         controlUnit.runInstruction();
     }
 
+    // Retorna a string em assembly da instrução sendo executada
     public String currentInstruction() {
         return controlUnit.getCurrentInstructionStr();
     }
 
+    // Retorna uma string do estado atual dos registradores, caso
+    // 'ControlUnit.hasRegisterDump' esteja como true
     public String registerDump() {
 
         StringBuilder sb = new StringBuilder();
