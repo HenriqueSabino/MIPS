@@ -190,16 +190,16 @@ public class ControlUnit {
 
         switch (iInstruction.getOpcode()) {
             case 0x01: // 1
-                currentInstructionStr = "bltz $" + rs + ", " + address(im);
-                alu.branchLessThanZero(iInstruction.getRs(), address(iInstruction.getIm()));
+                currentInstructionStr = "bltz $" + rs + ", " + im;
+                alu.branchLessThanZero(iInstruction.getRs(), iInstruction.getIm());
                 break;
             case 0x04: // 4
-                currentInstructionStr = "beq $" + rs + ", $" + rt + ", " + address(im);
-                alu.branchEqual(iInstruction.getRs(), iInstruction.getRt(), address(iInstruction.getIm()));
+                currentInstructionStr = "beq $" + rs + ", $" + rt + ", " + im;
+                alu.branchEqual(iInstruction.getRs(), iInstruction.getRt(), iInstruction.getIm());
                 break;
             case 0x05: // 5
-                currentInstructionStr = "bne $" + rs + ", $" + rt + ", " + address(im);
-                alu.branchNotEqual(iInstruction.getRs(), iInstruction.getRt(), address(iInstruction.getIm()));
+                currentInstructionStr = "bne $" + rs + ", $" + rt + ", " + im;
+                alu.branchNotEqual(iInstruction.getRs(), iInstruction.getRt(), iInstruction.getIm());
                 break;
             case 0x08: // 8
                 hasRegisterDump = true;
@@ -281,10 +281,10 @@ public class ControlUnit {
 
         switch (jInstruction.getOpcode()) {
             case 0x02: // 2
-                currentInstructionStr = "j " + address;
+                currentInstructionStr = "j " + jInstruction.getAd();
                 break;
             case 0x03: // 3
-                currentInstructionStr = "jal " + address;
+                currentInstructionStr = "jal " + jInstruction.getAd();
                 break;
         }
     }
