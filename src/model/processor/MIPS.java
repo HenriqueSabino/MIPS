@@ -1,8 +1,21 @@
+/*
+ * Projeto - MIPS
+ *
+ * Grupo:
+ *
+ * Henrique Sabino
+ * Hyan Batista
+ * Nelson Lins
+ * Silas Augusto
+ *
+ */
+
 package model.processor;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+// Builda a string que vai ser retornada no arquivo de saida
 public class MIPS {
 
     RegisterBank registerBank;

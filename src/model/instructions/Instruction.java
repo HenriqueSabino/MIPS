@@ -1,3 +1,15 @@
+/*
+ * Projeto - MIPS
+ *
+ * Grupo:
+ *
+ * Henrique Sabino
+ * Hyan Batista
+ * Nelson Lins
+ * Silas Augusto
+ *
+ */
+
 package model.instructions;
 
 // Classe que define que uma instrução deve ao menos ter um código de operação

@@ -1,3 +1,15 @@
+/*
+ * Projeto - MIPS
+ *
+ * Grupo:
+ *
+ * Henrique Sabino
+ * Hyan Batista
+ * Nelson Lins
+ * Silas Augusto
+ *
+ */
+
 package model.instructions;
 
 // Molde das instruções tipo R
@@ -6,6 +18,7 @@ public class RInstruction extends Instruction {
     // 000000 00000 00000 00000 00000 000000
     // op rs rt rd sa ft
 
+    // Construtor das instruções tipo R, retorna uma exceção caso o OpCode seja diferente de 000
     public RInstruction(int instruction) {
         super(instruction);
 

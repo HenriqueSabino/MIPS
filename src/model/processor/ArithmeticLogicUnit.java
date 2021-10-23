@@ -1,3 +1,15 @@
+/*
+ * Projeto - MIPS
+ *
+ * Grupo:
+ *
+ * Henrique Sabino
+ * Hyan Batista
+ * Nelson Lins
+ * Silas Augusto
+ *
+ */
+
 package model.processor;
 
 // Performa as operações lógicas e aritméticas do processador
@@ -9,7 +21,7 @@ public class ArithmeticLogicUnit {
         this.registerBank = registerBank;
     }
 
-    // Rinstructions
+    // Funções que retornam instruções do tipo R
     public int shiftLeftLogical(int rt, int shamt) {
 
         rt = registerBank.getRegister(rt);
@@ -177,6 +189,7 @@ public class ArithmeticLogicUnit {
         return (rs < rt) ? 1 : 0;
     }
 
+    // Funções que retornam instruções do tipo I
     public void branchLessThanZero(int rs, int im) {
     }
 

@@ -1,5 +1,18 @@
+/*
+ * Projeto - MIPS
+ *
+ * Grupo:
+ *
+ * Henrique Sabino
+ * Hyan Batista
+ * Nelson Lins
+ * Silas Augusto
+ *
+ */
+
 package model.processor;
 
+// Armazena o conjunto de registradores
 public class RegisterBank {
 
     private int[] registers;

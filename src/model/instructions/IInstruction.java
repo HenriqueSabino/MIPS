@@ -1,3 +1,15 @@
+/*
+ * Projeto - MIPS
+ *
+ * Grupo:
+ *
+ * Henrique Sabino
+ * Hyan Batista
+ * Nelson Lins
+ * Silas Augusto
+ *
+ */
+
 package model.instructions;
 
 // Molde das instruções tipo I
@@ -6,6 +18,7 @@ public class IInstruction extends Instruction {
     // 000000 00000 00000 0000000000000000
     // op rs rt im
 
+    // Construtor das instruções tipo I, retorna uma exceção caso o OpCode seja igual a 000,002 ou 003
     public IInstruction(int instruction) {
         super(instruction);
 

@@ -1,3 +1,15 @@
+/*
+ * Projeto - MIPS
+ *
+ * Grupo:
+ *
+ * Henrique Sabino
+ * Hyan Batista
+ * Nelson Lins
+ * Silas Augusto
+ *
+ */
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;

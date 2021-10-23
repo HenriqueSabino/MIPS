@@ -1,3 +1,15 @@
+/*
+ * Projeto - MIPS
+ *
+ * Grupo:
+ *
+ * Henrique Sabino
+ * Hyan Batista
+ * Nelson Lins
+ * Silas Augusto
+ *
+ */
+
 package model.processor;
 
 import model.instructions.IInstruction;
@@ -50,6 +62,7 @@ public class ControlUnit {
         }
     }
 
+    // Identifica qual função que vai ser executada para rodar as instruções
     private void run() {
         if (currentInstruction.getClass() == RInstruction.class) {
             runRInstruction();
@@ -60,6 +73,7 @@ public class ControlUnit {
         }
     }
 
+    // Roda as instruções do tipo R
     private void runRInstruction() {
 
         RInstruction rInstruction = (RInstruction) currentInstruction;
@@ -70,6 +84,7 @@ public class ControlUnit {
 
         hasRegisterDump = true;
 
+        // Identifica especificamente a instrução do tipo R baseado no codigo de função
         switch (rInstruction.getFunction()) {
             case 0x00:
                 currentInstructionStr = "sll $" + rd + ", $" + rt + ", " + shamt;
@@ -179,6 +194,7 @@ public class ControlUnit {
         }
     }
 
+    // Roda as instruções do tipo I
     private void runIInstruction() {
 
         IInstruction iInstruction = (IInstruction) currentInstruction;
@@ -188,6 +204,7 @@ public class ControlUnit {
 
         hasRegisterDump = false;
 
+        // Identifica especificamente a instrução do tipo I baseado no codigo de operação
         switch (iInstruction.getOpcode()) {
             case 0x01: // 1
                 currentInstructionStr = "bltz $" + rs + ", " + im;
@@ -271,6 +288,7 @@ public class ControlUnit {
         return imShort; // Java extende o sinal automaticamente nesse cast
     }
 
+    // Roda as instruções do tipo J
     private void runJInstruction() {
 
         hasRegisterDump = false;
@@ -279,6 +297,7 @@ public class ControlUnit {
         // Cálculo do endereço para desvio
         int address = (registerBank.getPC() & 0xF0000000) | ((jInstruction.getAd() << 2));
 
+        // Identifica especificamente a instrução do tipo J baseado no codigo de operação
         switch (jInstruction.getOpcode()) {
             case 0x02: // 2
                 currentInstructionStr = "j " + jInstruction.getAd();
@@ -289,6 +308,8 @@ public class ControlUnit {
         }
     }
 
+
+    // Identifica o tipo da instrução
     private void decodeInstruction(int instruction) {
 
         try {
@@ -308,10 +329,11 @@ public class ControlUnit {
         }
     }
 
+    // Retorna a instrução atual
     public String getCurrentInstructionStr() {
         return currentInstructionStr;
     }
-
+    
     public boolean getHasRegisterDump() {
         return hasRegisterDump;
     }
