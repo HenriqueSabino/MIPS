@@ -212,13 +212,20 @@ public class ArithmeticLogicUnit {
     // Operações do tipo I
 
     // Desvios condicionais
-    public void branchLessThanZero(int rs, int im) {
+
+    // Retorna true caso o valor de rs seja menor que 0
+    public boolean branchLessThanZero(int rs) {
+        return registerBank.getRegister(rs) < 0;
     }
 
-    public void branchEqual(int rs, int rt, int im) {
+    // Retorna true caso o valor de rs seja igual ao valor de rt
+    public boolean branchEqual(int rs, int rt) {
+        return registerBank.getRegister(rs) == registerBank.getRegister(rt);
     }
 
-    public void branchNotEqual(int rs, int rt, int im) {
+    // Retorna true caso o valor de rs seja diferente ao valor de rt
+    public boolean branchNotEqual(int rs, int rt) {
+        return registerBank.getRegister(rs) != registerBank.getRegister(rt);
     }
 
     // Operações lógicas ou aritméticas

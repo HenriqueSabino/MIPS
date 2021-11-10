@@ -18,10 +18,11 @@ import java.io.IOException;
 // Define o processador MIPS
 public class MIPS {
 
-    RegisterBank registerBank;
-    ArithmeticLogicUnit alu;
-    InstructionMemory instructionMemory;
-    ControlUnit controlUnit;
+    private RegisterBank registerBank;
+    private ArithmeticLogicUnit alu;
+    private InstructionMemory instructionMemory;
+    private RAM ram;
+    private ControlUnit controlUnit;
 
     // Inicializando partes do processador
     public MIPS(String instructionPath) throws FileNotFoundException, IOException {
@@ -29,7 +30,8 @@ public class MIPS {
         registerBank = new RegisterBank();
         alu = new ArithmeticLogicUnit(registerBank);
         instructionMemory = new InstructionMemory(instructionPath);
-        controlUnit = new ControlUnit(registerBank, instructionMemory, alu);
+        ram = new RAM(1024);
+        controlUnit = new ControlUnit(registerBank, instructionMemory, ram, alu);
     }
 
     // Executa a próxima instrução
@@ -63,5 +65,34 @@ public class MIPS {
         }
 
         return sb.toString();
+    }
+
+    public String memoryDump() {
+
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("MEM[");
+
+        int count = 0;
+        for (int i = 0; i < ram.getSize(); i++) {
+
+            byte read = ram.readAt(i);
+            if (read != 0) {
+                if (count != 0)
+                    sb.append(";");
+                sb.append(i + ":" + read);
+                count++;
+            }
+        }
+
+        sb.append(']');
+
+        String out = sb.toString();
+
+        if (out.equals("MEM[]")) {
+            return "";
+        }
+
+        return out;
     }
 }

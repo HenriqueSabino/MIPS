@@ -52,8 +52,15 @@ public class App {
                     bw.write('\n');
                 }
 
+                // Imprime o dump da memória RAM caso haja
+                String dump = mips.memoryDump();
+
+                if (!dump.isEmpty()) {
+                    output += "\n" + dump;
+                }
+
                 // Imprime o dump dos registradores caso haja
-                String dump = mips.registerDump();
+                dump = mips.registerDump();
 
                 if (!dump.isEmpty()) {
                     output += "\n" + dump;

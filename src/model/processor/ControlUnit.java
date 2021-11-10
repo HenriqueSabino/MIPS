@@ -21,6 +21,7 @@ import model.instructions.RInstruction;
 public class ControlUnit {
 
     private InstructionMemory instructionMemory;
+    private RAM ram;
     private ArithmeticLogicUnit alu;
     private RegisterBank registerBank;
     private Instruction currentInstruction;
@@ -30,9 +31,11 @@ public class ControlUnit {
     // registradores
     private boolean hasRegisterDump;
 
-    public ControlUnit(RegisterBank registerBank, InstructionMemory instructionMemory, ArithmeticLogicUnit alu) {
+    public ControlUnit(RegisterBank registerBank, InstructionMemory instructionMemory, RAM ram,
+            ArithmeticLogicUnit alu) {
 
         this.instructionMemory = instructionMemory;
+        this.ram = ram;
         this.alu = alu;
         this.registerBank = registerBank;
     }
@@ -121,6 +124,9 @@ public class ControlUnit {
         case 0x08:
             hasRegisterDump = false;
             currentInstructionStr = "jr $" + rs;
+
+            // Fazendo um desvio não condicional para o valor armazenado em rs
+            registerBank.setPC(registerBank.getRegister(rs));
             break;
         case 0x0c:
             hasRegisterDump = false;
@@ -212,6 +218,9 @@ public class ControlUnit {
         int rt = iInstruction.getRt();
         int im = iInstruction.getIm();
 
+        // Variáveis utilizadas nas intruções de load/store
+        int memAddress, word;
+        byte _byte;
         hasRegisterDump = false;
 
         // Identifica especificamente a instrução do tipo I baseado no codigo de
@@ -220,17 +229,29 @@ public class ControlUnit {
         case 0x01: // 1
             currentInstructionStr = "bltz $" + rs + ", " + im;
 
-            alu.branchLessThanZero(iInstruction.getRs(), iInstruction.getIm());
+            // Se a condição é atendida, atualize o PC
+            if (alu.branchLessThanZero(iInstruction.getRs())) {
+                // PC + 4 já acontece antes de rodar a instrução
+                registerBank.setPC(registerBank.getPC() + branchAddress(im));
+            }
             break;
         case 0x04: // 4
             currentInstructionStr = "beq $" + rs + ", $" + rt + ", " + im;
 
-            alu.branchEqual(iInstruction.getRs(), iInstruction.getRt(), iInstruction.getIm());
+            // Se a condição é atendida, atualize o PC
+            if (alu.branchEqual(rs, rt)) {
+                // PC + 4 já acontece antes de rodar a instrução
+                registerBank.setPC(registerBank.getPC() + branchAddress(im));
+            }
             break;
         case 0x05: // 5
             currentInstructionStr = "bne $" + rs + ", $" + rt + ", " + im;
 
-            alu.branchNotEqual(iInstruction.getRs(), iInstruction.getRt(), iInstruction.getIm());
+            // Se a condição é atendida, atualize o PC
+            if (alu.branchNotEqual(iInstruction.getRs(), iInstruction.getRt())) {
+                // PC + 4 já acontece antes de rodar a instrução
+                registerBank.setPC(registerBank.getPC() + branchAddress(im));
+            }
             break;
         case 0x08: // 8
             hasRegisterDump = true;
@@ -270,30 +291,89 @@ public class ControlUnit {
             break;
         case 0x0f: // 15
             currentInstructionStr = "lui $" + rt + ", " + im;
+
+            // Carregando os 16 bits de im como os 16 bits mais significativos de rt
+            registerBank.setRegister(rt, im << 16);
             break;
         case 0x20: // 32
             currentInstructionStr = "lb $" + rt + ", " + im + "($" + rs + ")";
+
+            // Pegando o byte em memAddress na memória e definindo o valor de rt para esse
+            // byte
+            memAddress = registerBank.getRegister(rs) + signExtend(im);
+            // Java já estende o sinal do byte
+            _byte = ram.readAt(memAddress);
+
+            registerBank.setRegister(rt, _byte);
+
             break;
         case 0x23: // 35
             currentInstructionStr = "lw $" + rt + ", " + im + "($" + rs + ")";
+
+            // Checando o alinhamento dos bits na memória
+            if (signExtend(im) % 4 != 0) {
+                throw new IllegalArgumentException("fetch address not aligned on word boundary");
+            }
+
+            // Pegando os 4 bytes na memória, iniciando por memAddress, no formato
+            // little-endian
+            memAddress = registerBank.getRegister(rs) + signExtend(im);
+            word = 0;
+
+            for (int i = 0; i < 4; i++) {
+                // Garantindo que os bytes não terão o sinal estendido
+                word = word | ((Byte.toUnsignedInt(ram.readAt(memAddress + i))) << (i * 8));
+            }
+
+            registerBank.setRegister(rt, word);
             break;
         case 0x24: // 36
             currentInstructionStr = "lbu $" + rt + ", " + im + "($" + rs + ")";
+
+            // Pegando o byte em memAddress na memória e definindo o valor de rt para esse
+            // byte
+            memAddress = registerBank.getRegister(rs) + signExtend(im);
+            // Convertendo o byte para o sinal zero estendido
+            word = Byte.toUnsignedInt(ram.readAt(memAddress));
+
+            registerBank.setRegister(rt, word);
             break;
         case 0x28: // 40
             currentInstructionStr = "sb $" + rt + ", " + im + "($" + rs + ")";
+
+            memAddress = registerBank.getRegister(rs) + signExtend(im);
+            // Java já pega os últimos 8 bits do int
+            _byte = (byte) registerBank.getRegister(rt);
+
+            ram.writeAt(memAddress, _byte);
             break;
         case 0x2b: // 43
             currentInstructionStr = "sw $" + rt + ", " + im + "($" + rs + ")";
+
+            // Checando o alinhamento dos bits na memória
+            if (signExtend(im) % 4 != 0) {
+                throw new IllegalArgumentException("store address not aligned on word boundary");
+            }
+
+            // Armazenando os 4 bytes na memória, iniciando por memAddress, no formato
+            // little-endian
+            memAddress = registerBank.getRegister(rs) + signExtend(im);
+            word = registerBank.getRegister(rt);
+
+            for (int i = 0; i < 4; i++) {
+                ram.writeAt(memAddress + i, (byte) (word >>> (i * 8)));
+            }
+
             break;
         }
     }
 
     // Calcula os endereços de instruções de desvio
-    public int address(int im) {
+    public int branchAddress(int im) {
         return registerBank.getPC() + signExtend(im) * 4;
     }
 
+    // Extende o sinal dos shorts para um int completo
     private int signExtend(int im) {
         short imShort = (short) im; // 16bits
         return imShort; // Java extende o sinal automaticamente nesse cast
@@ -313,9 +393,14 @@ public class ControlUnit {
         switch (jInstruction.getOpcode()) {
         case 0x02: // 2
             currentInstructionStr = "j " + jInstruction.getAd();
+            registerBank.setPC(address);
             break;
         case 0x03: // 3
             currentInstructionStr = "jal " + jInstruction.getAd();
+
+            // Armazenando o valor do PC em $ra antes de atualizar
+            registerBank.setRegister(31, registerBank.getPC());
+            registerBank.setPC(address);
             break;
         }
     }
