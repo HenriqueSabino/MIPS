@@ -67,6 +67,8 @@ public class MIPS {
         return sb.toString();
     }
 
+    // Retorna uma string do estado atual da memória ram
+    // Imprimindo apenas os bytes diferentes de zero
     public String memoryDump() {
 
         StringBuilder sb = new StringBuilder();

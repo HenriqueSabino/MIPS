@@ -135,11 +135,13 @@ public class ControlUnit {
         case 0x10:
             currentInstructionStr = "mfhi $" + rd;
 
+            // Setando $rd para o valor de HI
             registerBank.setRegister(rd, registerBank.getHI());
             break;
         case 0x12:
             currentInstructionStr = "mflo $" + rd;
 
+            // Setando $rd para o valor de LO
             registerBank.setRegister(rd, registerBank.getLO());
             break;
         case 0x18:
@@ -230,9 +232,9 @@ public class ControlUnit {
             currentInstructionStr = "bltz $" + rs + ", " + im;
 
             // Se a condição é atendida, atualize o PC
-            if (alu.branchLessThanZero(iInstruction.getRs())) {
+            if (alu.branchLessThanZero(rs)) {
                 // PC + 4 já acontece antes de rodar a instrução
-                registerBank.setPC(registerBank.getPC() + branchAddress(im));
+                registerBank.setPC(branchAddress(im));
             }
             break;
         case 0x04: // 4
@@ -241,16 +243,16 @@ public class ControlUnit {
             // Se a condição é atendida, atualize o PC
             if (alu.branchEqual(rs, rt)) {
                 // PC + 4 já acontece antes de rodar a instrução
-                registerBank.setPC(registerBank.getPC() + branchAddress(im));
+                registerBank.setPC(branchAddress(im));
             }
             break;
         case 0x05: // 5
             currentInstructionStr = "bne $" + rs + ", $" + rt + ", " + im;
 
             // Se a condição é atendida, atualize o PC
-            if (alu.branchNotEqual(iInstruction.getRs(), iInstruction.getRt())) {
+            if (alu.branchNotEqual(rs, rt)) {
                 // PC + 4 já acontece antes de rodar a instrução
-                registerBank.setPC(registerBank.getPC() + branchAddress(im));
+                registerBank.setPC(branchAddress(im));
             }
             break;
         case 0x08: // 8
